@@ -24,10 +24,18 @@ set(DEPLIBS ${p8-platform_LIBRARIES}
 message(STATUS "ZLIB_LIBRARIES: ${ZLIB_LIBRARIES}")
 
 set(IPTV_SOURCES src/client.cpp
-                 src/PVRIptvData.cpp)
+                 src/PVRIptvData.cpp
+                 src/ArchiveConfig.cpp
+                 src/iptv/ChannelStreamReader.cpp
+                 src/iptv/utilities/CatchupUrlFormatter.cpp)
 
 set(IPTV_HEADERS src/client.h
-                 src/PVRIptvData.h)
+                 src/PVRIptvData.h
+                 src/ArchiveConfig.h
+                 src/iptv/ChannelStreamReader.h
+                 src/iptv/IStreamReader.h
+                 src/iptv/utilities/CatchupUrlFormatter.h
+                 src/iptv/utilities/math.h)
 
 build_addon(pvr.iptvsimple IPTV DEPLIBS)
 

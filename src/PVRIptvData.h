@@ -29,6 +29,8 @@
 #include "libXBMC_pvr.h"
 #include "p8-platform/threads/threads.h"
 
+#define DVD_TIME_BASE 1000000
+
 struct PVRIptvEpgEntry
 {
   int         iBroadcastId;
@@ -62,10 +64,15 @@ struct PVRIptvChannel
   std::string strChannelName;
   std::string strLogoPath;
   std::string strStreamURL;
+  std::string strCatchupSource;
+  std::string strGroupName;
   std::string strTvgId;
   std::string strTvgName;
   std::string strTvgLogo;
   std::map<std::string, std::string> properties;
+  EPG_TAG     etEpgTag;
+  int         iCatchupLength;
+  time_t      tTimeshiftStartTime;
 };
 
 struct PVRIptvChannelGroup
@@ -91,6 +98,8 @@ public:
 
   virtual int       GetChannelsAmount(void);
   virtual PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio);
+  virtual bool      GetChannel(int uniqueId, PVRIptvChannel &myChannel);
+  virtual bool      GetChannel(const EPG_TAG *tag, PVRIptvChannel &myChannel);
   virtual bool      GetChannel(const PVR_CHANNEL &channel, PVRIptvChannel &myChannel);
   virtual int       GetChannelGroupsAmount(void);
   virtual PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio);
@@ -108,7 +117,7 @@ protected:
   virtual PVRIptvChannel*      FindChannel(const std::string &strId, const std::string &strName);
   virtual PVRIptvChannelGroup* FindGroup(const std::string &strName);
   virtual PVRIptvEpgChannel*   FindEpg(const std::string &strId);
-  virtual PVRIptvEpgChannel*   FindEpgForChannel(PVRIptvChannel &channel);
+  virtual PVRIptvEpgChannel*   FindEpgForChannel(const PVRIptvChannel &channel);
   virtual bool                 FindEpgGenre(const std::string& strGenre, int& iType, int& iSubType);
   virtual int                  ParseDateTime(std::string& strDate, bool iDateFormat = true);
   virtual bool                 GzipInflate( const std::string &compressedBytes, std::string &uncompressedBytes);
@@ -121,6 +130,7 @@ protected:
 
 protected:
   virtual void *Process(void);
+  virtual void FillEPGTag(const PVRIptvEpgEntry *epgEntry, const PVRIptvChannel &channel, int shift, EPG_TAG &tag);
 
 private:
   bool                              m_bTSOverride;
@@ -135,4 +145,6 @@ private:
   std::vector<PVRIptvEpgChannel>    m_epg;
   std::vector<PVRIptvEpgGenre>      m_genres;
   P8PLATFORM::CMutex                m_mutex;
+
+  long long                         m_iEpgUrlTimeOffset;
 };

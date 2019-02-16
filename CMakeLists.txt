@@ -1,4 +1,4 @@
-project(pvr.iptvsimple)
+project(pvr.iptvarchive)
 
 cmake_minimum_required(VERSION 2.6)
 
